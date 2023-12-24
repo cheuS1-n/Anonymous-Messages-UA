@@ -30,7 +30,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if len(update.effective_message.text.split(" ")) < 2:
         anonurl = f"https://t.me/AnonymousMessagesUA_bot?start={update.effective_user.id}"
         await update.effective_chat.send_message(
-            f"Привіт! Я бот який надасть змогу користувачам надсилати тобі анонімні повідомлення!\nПосилання для відправки тобі анонімних повідомлень: {anonurl}")
+            f"Привіт! Я бот який надасть змогу користувачам надсилати тобі анонімні повідомлення!\nПосилання для "
+            f"відправки анонімних повідомлень тобі: {anonurl}\n\nПерейшовши по цьому посиланню, людина зможе надіслати тобі повідомлення")
+        await update.effective_chat.send_message("Навіть якщо ти видалиш чат зі мною, я однаково зможу тобі надіслати повідомлення\nАле якщо ти мене заблокуєш, я вже не зможу тобі щось надіслати.")
         return ConversationHandler.END
     else:
         if update.effective_user.id == int(update.effective_message.text.split(" ")[1]):
@@ -47,7 +49,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     else:
                         print("++++")
                         await update.effective_chat.send_message(
-                            f"На жаль, ти не можеш так часто відправляти повідомлення. \nЗачекай ще {10 - a} секунд.")
+                            f"На жаль, ти не можеш так часто відправляти повідомлення. \nЗачекай ще {300 - a} секунд.")
                         return ConversationHandler.END
 
             sid = update.effective_message.text.split(" ")[1]
@@ -84,10 +86,15 @@ async def sendMSG(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except:
         await update.effective_chat.send_message(
             "Користувач якому ти хочеш надіслати повідомлення, заблокував мене, тому я не можу відправити твоє повідомлення😢")
-    finally:
         loggerm.info(
-            f"Користувач {update.effective_user.full_name}({update.effective_user.id}) надіслав анонімне повідомлення.")
+            f"Користувач {update.effective_user.full_name}({update.effective_user.id}) надіслав анонімне повідомлення. (Провал)")
         return ConversationHandler.END
+
+    loggerm.info(
+        f"Користувач {update.effective_user.full_name}({update.effective_user.id}) надіслав анонімне повідомлення")
+    await update.effective_chat.send_message("Повідомлення надіслане успішно🥳")
+    return ConversationHandler.END
+
 
 
 async def cancel_conv(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -128,7 +135,7 @@ def checktime(userid: int):
         for x in rtime:
             if userid == int(x[0]):
                 dl = datetime.datetime.now() - datetime.datetime.strptime(x[1], "%d/%m/%y %H:%M:%S.%f")
-                if dl.total_seconds() < 10:
+                if dl.total_seconds() < 300:
                     return int(dl.total_seconds())
                 else:
                     deltime(userid)
